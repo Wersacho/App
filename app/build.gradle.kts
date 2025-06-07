@@ -1,7 +1,10 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.gms) // google-services
+    alias(libs.plugins.jetbrainsKotlinAndroid)
+    alias(libs.plugins.gms)
+
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.plugin.serialization)
 }
 
 android {
@@ -52,11 +55,15 @@ android {
 
 dependencies {
 
-    implementation(platform(libs.firebase.bom)) //Firebase BoM
-    implementation(libs.firebase.firestore) //firestore
-    implementation(libs.firebase.storage) //storage
-    implementation(libs.coil.compose) // coil
+    implementation(libs.kotlin.serialization.json)
+    implementation(libs.androidx.navigation.compose)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage)
     implementation(libs.firebase.auth)
+
+    implementation(libs.coil.compose) // coil
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
