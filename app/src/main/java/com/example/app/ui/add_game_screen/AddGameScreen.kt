@@ -29,27 +29,54 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.app.R
+import com.example.app.data.Game
+import com.example.app.ui.add_game_screen.data.AddScreenObject
 import com.example.app.ui.login.LoginButton
 import com.example.app.ui.login.RoundedCornerTextField
 import com.example.app.ui.theme.BoxFilterColor
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.ktx.storage
 
 @Preview(showBackground = true)
 @Composable
-fun AddBookScreen() {
+fun AddGameScreen(
+    navData: AddScreenObject = AddScreenObject(),
+    onSaved: () -> Unit = {}
+) {
+
+    val selectedCategory = remember {
+        mutableStateOf(navData.category)
+    }
+
     val title = remember {
-        mutableStateOf("")
+        mutableStateOf(navData.title)
+    }
+
+    val navImageUrl = remember {
+        mutableStateOf(navData.imageUrl)
     }
 
     val description = remember {
-        mutableStateOf("")
+        mutableStateOf(navData.description)
     }
 
     val price = remember {
-        mutableStateOf("")
+        mutableStateOf(navData.price)
     }
 
     val selectedImageUri = remember {
         mutableStateOf<Uri?>(null)
+    }
+
+    val firestore = remember {
+        Firebase.firestore
+    }
+
+    val storage = remember {
+        Firebase.storage
     }
 
     Image(painter = painterResource(id = R.drawable.games_store_bg),
@@ -77,11 +104,14 @@ fun AddBookScreen() {
         val imageLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.GetContent()
         ) { uri ->
+            navImageUrl.value =""
             selectedImageUri.value = uri
         }
 
         Image(
-            painter = rememberAsyncImagePainter(model = selectedImageUri.value),
+            painter = rememberAsyncImagePainter(
+                model = navImageUrl.value.ifEmpty { selectedImageUri.value }
+            ),
             contentDescription = "logo",
             modifier = Modifier.size(90.dp)
         )
@@ -102,6 +132,15 @@ fun AddBookScreen() {
         Spacer(
             modifier = Modifier
                 .height(30.dp)
+        )
+
+        RoundedCornerDropDownMenu(selectedCategory.value) { selectedItem ->
+            selectedCategory.value = selectedItem
+        }
+
+        Spacer(
+            modifier = Modifier
+                .height(10.dp)
         )
 
         //поле ввода заголовок
@@ -137,7 +176,7 @@ fun AddBookScreen() {
         //поле ввода цена
 
         RoundedCornerTextField(
-            text = title.value,
+            text = price.value,
             label = "Цена"
         ) {
             price.value = it
@@ -158,7 +197,101 @@ fun AddBookScreen() {
             text = "Сохранить"
         ) {
 
+            val game = Game(
+                key = navData.key,
+                title = title.value,
+                description = description.value,
+                price = price.value,
+                category = selectedCategory.value
+            )
+
+            if (selectedImageUri.value != null) {
+
+                saveGameImage(
+                    navData.imageUrl,
+                    selectedImageUri.value!!,
+                    storage,
+                    firestore,
+                    game,
+                    onSaved = {
+                        onSaved()
+                    },
+                    onError = {
+
+                    }
+                )
+            } else {
+
+                saveGameToFireStore(
+                    firestore,
+                    game.copy(imageUrl = navData.imageUrl),
+                    onSaved = {
+                        onSaved()
+                    },
+                    onError = {
+
+                    }
+                )
+
+            }
+
         }
 
     }
+}
+
+private fun saveGameImage(
+    oldImageUrl: String,
+    uri: Uri,
+    storage: FirebaseStorage,
+    firestore: FirebaseFirestore,
+    game: Game,
+    onSaved: () -> Unit,
+    onError: () -> Unit
+) {
+    val timeStamp = System.currentTimeMillis()
+    val storageRef = if(oldImageUrl.isEmpty()) {
+        storage.reference
+            .child("game_images")
+            .child("image_$timeStamp.jpg")
+    } else {
+        storage.getReferenceFromUrl(oldImageUrl)
+    }
+    val uploadTask = storageRef.putFile(uri)
+    uploadTask.addOnSuccessListener {
+        storageRef.downloadUrl.addOnSuccessListener { url ->
+            saveGameToFireStore(
+                firestore,
+                game.copy(imageUrl = url.toString()),
+                onSaved = {
+                    onSaved()
+                },
+                onError = {
+                    onError()
+                }
+            )
+        }
+    }
+}
+
+private fun saveGameToFireStore(
+    firestore: FirebaseFirestore,
+    game: Game,
+    onSaved: () -> Unit,
+    onError: () -> Unit
+) {
+    val db = firestore.collection("games")
+    val key = game.key.ifEmpty { db.document().id }
+    db.document(key)
+        .set(
+            game.copy(
+                key = key,
+            )
+        )
+        .addOnSuccessListener {
+            onSaved()
+        }
+        .addOnFailureListener {
+            onError()
+        }
 }

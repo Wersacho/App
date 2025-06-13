@@ -38,13 +38,18 @@ import com.google.firebase.ktx.Firebase
 
 @Composable
 fun DrawerBody(
-
+    onAdmin: (Boolean) -> Unit = {},
+    onAdminClick: () -> Unit = {},
+    onFavClick: () -> Unit = {},
+    onCategoryClick: (String) -> Unit = {}
 ) {
     val categoriesList = listOf(
-        "Action",
-        "Adventure",
-        "Role-Playing (RPG)",
-        "Simulation"
+        "Избранное",
+        "Все",
+        "Экшен",
+        "Приключения",
+        "Ролевая игра (RPG)",
+        "Симулятор"
     )
 
     val isAdminState = remember {
@@ -54,6 +59,7 @@ fun DrawerBody(
     LaunchedEffect(Unit) {
         isAdmin { isAdmin ->
             isAdminState.value = isAdmin
+            onAdmin(isAdmin)
         }
     }
 
@@ -82,7 +88,7 @@ fun DrawerBody(
             )
 
             Text(
-                text = "Categories",
+                text = "Категории",
                 fontSize = 20.sp,
                 color = Color.Black,
                 fontWeight = FontWeight.Bold
@@ -109,7 +115,11 @@ fun DrawerBody(
                         Modifier
                             .fillMaxSize()
                             .clickable {
-
+                                if(categoriesList[0] == item) {
+                                    onFavClick()
+                                } else {
+                                    onCategoryClick(item)
+                                }
                             } // слушатель
                     ) {
 
@@ -145,7 +155,9 @@ fun DrawerBody(
             }
 
             if(isAdminState.value) Button(
-                onClick = {},
+                onClick = {
+                    onAdminClick()
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(5.dp),
@@ -154,7 +166,7 @@ fun DrawerBody(
                 )
             ) {
                 Text(
-                    text = "Администратор",
+                    text = "Добавить товар",
                     color = Color.Black
                 )
             }

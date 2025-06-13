@@ -7,8 +7,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.example.app.ui.add_game_screen.AddBookScreen
+import com.example.app.ui.add_game_screen.AddGameScreen
 import com.example.app.ui.add_game_screen.data.AddScreenObject
+import com.example.app.ui.details_screen.data.DetailsNavObject
+import com.example.app.ui.details_screen.ui.DetailsScreen
 import com.example.app.ui.login.LoginScreen
 import com.example.app.ui.login.data.LoginScreenObject
 import com.example.app.ui.login.data.MainScreenDataObject
@@ -26,7 +28,7 @@ class MainActivity : ComponentActivity() {
 
             NavHost(
                 navController = navController,
-                startDestination = AddScreenObject
+                startDestination = LoginScreenObject
             ) {
 
                 composable<LoginScreenObject> {
@@ -38,11 +40,46 @@ class MainActivity : ComponentActivity() {
                 composable<MainScreenDataObject> { navEntry ->
                     // получение данных
                     val navData = navEntry.toRoute<MainScreenDataObject>()
-                    MainScreen(navData)
+                    MainScreen(
+                        navData,
+                        onGameClick = { gm ->
+                            navController.navigate(DetailsNavObject(
+                                title = gm.title,
+                                description = gm.description,
+                                price = gm.price,
+                                category = gm.category,
+                                imageUrl = gm.imageUrl
+                            ))
+                        },
+                        onGameEditClick = { game ->
+                            navController.navigate(
+                                AddScreenObject(
+                                    key = game.key,
+                                    title = game.title,
+                                    description = game.description,
+                                    price = game.price,
+                                    category = game.category,
+                                    imageUrl = game.imageUrl
+                                )
+                            )
+                        }
+                    ){
+                        navController.navigate(AddScreenObject())
+                    }
                 }
 
                 composable<AddScreenObject> { navEntry ->
-                    AddBookScreen()
+                    val navData = navEntry.toRoute<AddScreenObject>()
+
+                    AddGameScreen(navData)
+                    {
+                        navController.popBackStack()
+                    }
+                }
+
+                composable<DetailsNavObject> { navEntry ->
+                    val navData = navEntry.toRoute<DetailsNavObject>()
+                    DetailsScreen(navData)
                 }
             }
 

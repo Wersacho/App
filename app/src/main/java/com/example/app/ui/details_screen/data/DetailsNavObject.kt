@@ -1,11 +1,11 @@
-package com.example.app.ui.add_game_screen.data
+package com.example.app.ui.details_screen.data
 
+import android.icu.text.CaseMap.Title
 import kotlinx.serialization.Serializable
 
-
+//передаем инфу с одного экрана на другой
 @Serializable
-data class AddScreenObject(
-    val key: String = "",
+data class DetailsNavObject(
     val title: String = "",
     val description: String = "",
     val price: String = "",
