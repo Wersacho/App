@@ -17,8 +17,9 @@ import com.example.app.ui.login.data.MainScreenDataObject
 import com.example.app.ui.main_screen.DrawerBody
 import com.example.app.ui.main_screen.MainScreen
 import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,7 +42,7 @@ class MainActivity : ComponentActivity() {
                     // получение данных
                     val navData = navEntry.toRoute<MainScreenDataObject>()
                     MainScreen(
-                        navData,
+                        navData = navData,
                         onGameClick = { gm ->
                             navController.navigate(DetailsNavObject(
                                 title = gm.title,

@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.app.data.Favorite
 import com.example.app.data.Game
 import com.example.app.ui.login.data.MainScreenDataObject
@@ -37,6 +38,8 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun MainScreen(
+    viewModel: MainScreenViewModel = hiltViewModel(),
+
     navData: MainScreenDataObject,
     onGameEditClick: (Game) -> Unit,
     onGameClick: (Game) -> Unit,
@@ -46,32 +49,16 @@ fun MainScreen(
     val drawerState = rememberDrawerState(DrawerValue.Closed) // drawer закрыт
     val coroutineScope = rememberCoroutineScope()
 
-    val gamesListState = remember {
-        mutableStateOf(emptyList<Game>())
-    }
-
-    val selectedBottomItemState = remember {
-        mutableStateOf(BottomMenuItem.Home.title)
-    }
-
     val isAdminState = remember {
         mutableStateOf(false)
     }
 
-    val isFavListEmptyState = remember {
-        mutableStateOf(false)
-    }
 
-    //инициализация бд
-    val db = remember { Firebase.firestore }
 
     //при запуске
     LaunchedEffect(Unit) {
-        getAllFavsIds(db, navData.uid) { favs ->
-            getAllGames(db, favs) { games ->
-                isFavListEmptyState.value = games.isEmpty()
-                gamesListState.value = games
-            }
+        if (viewModel.gamesListState.value.isEmpty()) {
+            viewModel.getAllGames()
         }
     }
 
@@ -90,13 +77,10 @@ fun MainScreen(
                     },
 
                     onFavClick = {
-                        selectedBottomItemState.value = BottomMenuItem.Favs.title
-                        getAllFavsIds(db, navData.uid) { favs ->
-                            getAllFavsGames(db, favs) { games ->
-                                isFavListEmptyState.value = games.isEmpty()
-                                gamesListState.value = games
-                            }
-                        }
+                        viewModel.selectedBottomItemState.value = BottomMenuItem.Favs.title
+
+                        viewModel.getAllFavsGames()
+
                         coroutineScope.launch {
                             drawerState.close()
                         }
@@ -111,18 +95,11 @@ fun MainScreen(
                     },
 
                     onCategoryClick = { category ->
-                        getAllFavsIds(db, navData.uid) { favs ->
-                            if (category == "Все") {
-                                getAllGames(db, favs) { games ->
-                                    gamesListState.value = games
-                                }
-                            } else {
-                                getAllGamesFromCategory(db, favs, category) { games ->
-                                    gamesListState.value = games
-                                }
-                            }
 
-                        }
+                        viewModel.getGamesFromCategory(category)
+
+                        viewModel.selectedBottomItemState.value = BottomMenuItem.Home.title
+
                         coroutineScope.launch {
                             drawerState.close()
                         }
@@ -136,32 +113,25 @@ fun MainScreen(
             modifier = Modifier.fillMaxSize(),
             bottomBar = {
                 BottomMenu(
-                    selectedBottomItemState.value,
+                    viewModel.selectedBottomItemState.value,
 
                     onFavsClick = {
-                        selectedBottomItemState.value = BottomMenuItem.Favs.title
-                        getAllFavsIds(db, navData.uid) { favs ->
-                            getAllFavsGames(db, favs) { games ->
-                                isFavListEmptyState.value = games.isEmpty()
-                                gamesListState.value = games
-                            }
-                        }
+                        viewModel.selectedBottomItemState.value = BottomMenuItem.Favs.title
+
+                        viewModel.getAllFavsGames()
+
                     },
 
                     onHomeClick = {
-                        selectedBottomItemState.value = BottomMenuItem.Home.title
-                        getAllFavsIds(db, navData.uid) { favs ->
-                            getAllGames(db, favs) { games ->
-                                isFavListEmptyState.value = games.isEmpty()
-                                gamesListState.value = games
-                            }
-                        }
+                        viewModel.selectedBottomItemState.value = BottomMenuItem.Home.title
+
+                        viewModel.getAllGames()
                     }
                 )
             }
         ) { paddingValues ->
 
-            if (isFavListEmptyState.value) {
+            if (viewModel.isFavListEmptyState.value) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize(),
@@ -186,7 +156,7 @@ fun MainScreen(
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                items(gamesListState.value) { game ->
+                items(viewModel.gamesListState.value) { game ->
                     GameListItemUi(
                         isAdminState.value,
                         game,
@@ -200,25 +170,9 @@ fun MainScreen(
                         },
 
                         onFavClick = {
-                            gamesListState.value = gamesListState.value.map { gm ->
-                                if (gm.key == game.key) {
-                                    onFavs(
-                                        db,
-                                        navData.uid,
-                                        Favorite(gm.key),
-                                        !gm.isFavorite
-                                    )
-                                    gm.copy(isFavorite = !gm.isFavorite)
-                                } else {
-                                    gm
-                                }
-                            }
 
-                            if (selectedBottomItemState.value == BottomMenuItem.Favs.title) {
-                                gamesListState.value = gamesListState.value.filter {
-                                    it.isFavorite
-                                }
-                            }
+                            viewModel.onFavClick(game, viewModel.selectedBottomItemState.value)
+
                         }
                     )
                 }
@@ -228,121 +182,5 @@ fun MainScreen(
 
 }
 
-private fun getAllGamesFromCategory(
-    db: FirebaseFirestore,
-    idsList: List<String>,
-    category: String,
-    onGames: (List<Game>) -> Unit
-) {
-    db.collection("games")
-        .whereEqualTo("category", category)
-        .get()
-        .addOnSuccessListener { task ->
-            val gamesList = task.toObjects(Game::class.java).map {
-                if (idsList.contains(it.key)) {
-                    it.copy(isFavorite = true)
-                } else {
-                    it
-                }
-            }
-            onGames(gamesList)
-        }
-        .addOnFailureListener {
 
-        }
-}
 
-private fun getAllGames(
-    db: FirebaseFirestore,
-    idsList: List<String>,
-    onGames: (List<Game>) -> Unit
-) {
-    db.collection("games")
-        .get()
-        .addOnSuccessListener { task ->
-            val gamesList = task.toObjects(Game::class.java).map {
-                if (idsList.contains(it.key)) {
-                    it.copy(isFavorite = true)
-                } else {
-                    it
-                }
-            }
-            onGames(gamesList)
-        }
-        .addOnFailureListener {
-
-        }
-}
-
-private fun getAllFavsGames(
-    db: FirebaseFirestore,
-    idsList: List<String>,
-    onGames: (List<Game>) -> Unit
-) {
-    if (idsList.isNotEmpty()) {
-        db.collection("games")
-            .whereIn(FieldPath.documentId(), idsList)
-            .get()
-            .addOnSuccessListener { task ->
-                val gamesList = task.toObjects(Game::class.java).map {
-                    if (idsList.contains(it.key)) {
-                        it.copy(isFavorite = true)
-                    } else {
-                        it
-                    }
-                }
-                onGames(gamesList)
-            }
-            .addOnFailureListener {
-
-            }
-    } else {
-        onGames(emptyList())
-    }
-}
-
-private fun getAllFavsIds(
-    db: FirebaseFirestore,
-    uid: String,
-    onFavs: (List<String>) -> Unit
-) {
-    db.collection("users")
-        .document(uid)
-        .collection("favs")
-        .get()
-        .addOnSuccessListener { task ->
-            val idsList = task.toObjects(Favorite::class.java)
-            val keysList = arrayListOf<String>()
-            idsList.forEach{
-                keysList.add(it.key)
-            }
-            onFavs(keysList)
-        }
-        .addOnFailureListener {
-
-        }
-}
-
-//добавляет и удаляет мз избранных
-private fun onFavs(
-    db: FirebaseFirestore,
-    uid: String,
-    favorite: Favorite,
-    isFav: Boolean,
-) {
-    if (isFav) {
-        db.collection("users")
-            .document(uid)
-            .collection("favs")
-            .document(favorite.key)
-            .set( // добавляет
-                favorite
-            )
-    } else {
-        db.collection("users")
-            .document(uid)
-            .collection("favs")
-            .document(favorite.key)
-            .delete() // удаляет
-    }
-}

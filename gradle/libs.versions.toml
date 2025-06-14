@@ -1,20 +1,26 @@
 [versions]
 agp = "8.6.0"
 coilCompose = "2.6.0"
-kotlin = "2.0.0"
+kotlin = "2.1.0"
 coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.9.0"
+lifecycleRuntimeKtx = "2.9.1"
 activityCompose = "1.10.1"
-composeBom = "2024.04.01"
+composeBom = "2025.06.00"
 gmsVersion = "4.4.2"
-bomVersion = "33.1.2"
+bomVersion = "33.15.0"
 
 navigationCompose = "2.9.0"
-serializationVersion = "2.0.0"
-serializationKotlin = "1.7.1"
+serializationVersion = "2.1.0"
+serializationKotlin = "1.7.3"
+
+#dagger-hilt
+hiltAndroid = "2.51.1"
+hiltNavCompose = "1.2.0"
+kspPlugin = "2.1.0-1.0.29"
+hiltPlugin = "2.50"
 
 
 [libraries]
@@ -45,6 +51,12 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 
+android-hilt = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
+android-hilt-compliler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
+
+hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavCompose" }
+hilt-navigation-compose-compiler = {module = "androidx.hilt:hilt-compiler", version.ref = "hiltNavCompose" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -53,4 +65,7 @@ gms = { id = "com.google.gms.google-services", version.ref = "gmsVersion" }
 
 plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "serializationVersion" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+
+ksp-plugin = { id = "com.google.devtools.ksp", version.ref = "kspPlugin" }
+hilt-plugin = { id = "com.google.dagger.hilt.android", version.ref = "hiltPlugin" }
 
