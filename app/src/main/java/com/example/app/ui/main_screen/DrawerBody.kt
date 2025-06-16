@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -26,10 +27,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.app.R
+import com.example.app.ui.main_screen.utils.Categories
 import com.example.app.ui.theme.DarkRed
 import com.example.app.ui.theme.GrayLight
 import com.google.firebase.auth.ktx.auth
@@ -40,17 +44,9 @@ import com.google.firebase.ktx.Firebase
 fun DrawerBody(
     onAdmin: (Boolean) -> Unit = {},
     onAdminClick: () -> Unit = {},
-    onFavClick: () -> Unit = {},
-    onCategoryClick: (String) -> Unit = {}
+    onCategoryClick: (Int) -> Unit = {}
 ) {
-    val categoriesList = listOf(
-        "Избранное",
-        "Все",
-        "Экшен",
-        "Приключения",
-        "Ролевая игра (RPG)",
-        "Симулятор"
-    )
+    val categoriesList = stringArrayResource(id = R.array.category_array)
 
     val isAdminState = remember {
         mutableStateOf(false)
@@ -88,7 +84,8 @@ fun DrawerBody(
             )
 
             Text(
-                text = "Категории",
+                text = stringResource(R.string.categories),
+                //text = "Categories",
                 fontSize = 20.sp,
                 color = Color.Black,
                 fontWeight = FontWeight.Bold
@@ -103,73 +100,59 @@ fun DrawerBody(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(1.dp)
-                    .background(GrayLight)
+                    .background(Color.White)
             )
 
             LazyColumn(
                 Modifier.fillMaxWidth()
             ) {
-                items(categoriesList) { item ->
 
-                    Column(
-                        Modifier
-                            .fillMaxSize()
-                            .clickable {
-                                if(categoriesList[0] == item) {
-                                    onFavClick()
-                                } else {
-                                    onCategoryClick(item)
-                                }
-                            } // слушатель
+                item {
+                    DrawerListItem(
+                        title = stringResource(id = R.string.favs)
                     ) {
+                        onCategoryClick(Categories.FAVORITES)
+                    }
 
-                        Spacer(
-                            modifier = Modifier
-                                .height(10.dp)
-                        )
-
-                        Text(
-                            text = item,
-                            color = Color.White,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .wrapContentWidth()
-                        )
-
-                        Spacer(
-                            modifier = Modifier
-                                .height(10.dp)
-                        )
-
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(1.dp)
-                                .background(GrayLight)
-                        )
-
+                    DrawerListItem(
+                        title = stringResource(id = R.string.all)
+                    ) {
+                        onCategoryClick(Categories.ALL)
                     }
                 }
+
+                itemsIndexed(categoriesList) { index, title ->
+
+                    DrawerListItem(
+                        title
+                    ) {
+                        onCategoryClick(index)
+                    }
+
+                }
+
+                item {
+                    if(isAdminState.value) Button(
+                        onClick = {
+                            onAdminClick()
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(5.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.White
+                        )
+                    ) {
+                        Text(
+                            text = stringResource(R.string.add_product),
+                            color = Color.Black
+                        )
+                    }
+                }
+
             }
 
-            if(isAdminState.value) Button(
-                onClick = {
-                    onAdminClick()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(5.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White
-                )
-            ) {
-                Text(
-                    text = "Добавить товар",
-                    color = Color.Black
-                )
-            }
+
 
         }
     }

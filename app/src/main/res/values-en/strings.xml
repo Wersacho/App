@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">App</string>
+    <string name="reset_password_message">A password reset link has been sent to your email. Follow the instructions to reset your password.</string>
+    <!--    App name -->
+    <string name="app_name_ru" translatable="false">ИгроХаб</string>
+    <!--    Login screen-->
+    <string name="sign_in">Login</string>
+    <string name="sign_up">Register</string>
+    <string name="sign_out">Logout</string>
+    <string name="enter">Continue</string>
+    <string name="email">Email</string>
+    <string name="reset_password">Reset password</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="password">Password</string>
+    <!--    Bottom nav-->
+    <string name="home">Home</string>
+    <string name="favs">Favorites</string>
+    <string name="settings">Settings</string>
+    <!--    DrawerBody-->
+    <string name="add_product">Add Product</string>
+    <string name="categories">Categories</string>
+    <string name="all">All</string>
+    <!--FavScreen-->
+    <string name="favs_empty">"Favorites is empty — add games you like!"</string>
+    <!--Dialog-->
+    <string name="attention">Attention!</string>
+    <string name="attention_message">Are you sure you want to delete the product?</string>
+    <!--AddGameScreen-->
+    <string name="title">Title</string>
+    <string name="description">Description</string>
+    <string name="price">Price</string>
+    <string name="choose_image">Choose Image</string>
+    <string name="save">Save</string>
+
+</resources>

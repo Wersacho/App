@@ -6,24 +6,25 @@ import com.example.app.R
 
 sealed class BottomMenuItem(
     val route: String,
-    val title: String,
+    //ид ресурса
+    val titleId: Int,
     val iconId: Int
 ) {
     object Home : BottomMenuItem(
         route = "",
-        title = "Главная",
+        titleId = R.string.home,
         iconId = R.drawable.ic_home
     )
 
     object Favs : BottomMenuItem(
         route = "",
-        title = "Избранное",
+        titleId = R.string.favs,
         iconId = R.drawable.ic_fav
     )
 
     object Settings : BottomMenuItem(
         route = "",
-        title = "Настройки",
+        titleId = R.string.settings,
         iconId = R.drawable.ic_settings
     )
 }

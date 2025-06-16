@@ -14,9 +14,7 @@ import com.example.app.ui.details_screen.ui.DetailsScreen
 import com.example.app.ui.login.LoginScreen
 import com.example.app.ui.login.data.LoginScreenObject
 import com.example.app.ui.login.data.MainScreenDataObject
-import com.example.app.ui.main_screen.DrawerBody
 import com.example.app.ui.main_screen.MainScreen
-import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -48,7 +46,7 @@ class MainActivity : ComponentActivity() {
                                 title = gm.title,
                                 description = gm.description,
                                 price = gm.price,
-                                category = gm.category,
+                                categoryIndex = gm.category,
                                 imageUrl = gm.imageUrl
                             ))
                         },
@@ -59,7 +57,7 @@ class MainActivity : ComponentActivity() {
                                     title = game.title,
                                     description = game.description,
                                     price = game.price,
-                                    category = game.category,
+                                    categoryIndex = game.category,
                                     imageUrl = game.imageUrl
                                 )
                             )
@@ -72,10 +70,13 @@ class MainActivity : ComponentActivity() {
                 composable<AddScreenObject> { navEntry ->
                     val navData = navEntry.toRoute<AddScreenObject>()
 
-                    AddGameScreen(navData)
-                    {
-                        navController.popBackStack()
-                    }
+                    AddGameScreen(
+                        navData,
+                        onSaved = {
+                            navController.popBackStack()
+                        }
+                    )
+
                 }
 
                 composable<DetailsNavObject> { navEntry ->

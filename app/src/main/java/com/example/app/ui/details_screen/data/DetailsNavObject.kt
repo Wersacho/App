@@ -1,6 +1,6 @@
 package com.example.app.ui.details_screen.data
 
-import android.icu.text.CaseMap.Title
+import com.example.app.ui.main_screen.utils.Categories
 import kotlinx.serialization.Serializable
 
 //передаем инфу с одного экрана на другой
@@ -9,6 +9,6 @@ data class DetailsNavObject(
     val title: String = "",
     val description: String = "",
     val price: String = "",
-    val category: String = "",
+    val categoryIndex: Int = Categories.ACTION,
     val imageUrl: String = ""
 )

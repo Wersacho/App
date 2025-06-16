@@ -3,6 +3,7 @@ package com.example.app.ui.login
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +16,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -22,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -29,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.app.R
+import com.example.app.custom.MyDialog
 import com.example.app.ui.login.data.MainScreenDataObject
 import com.example.app.ui.theme.BoxFilterColor
 import com.google.firebase.Firebase
@@ -43,20 +48,18 @@ fun LoginScreen(
     onNavigateToMainScreen: (MainScreenDataObject) -> Unit
 ) {
 
-    val auth = remember {
-        Firebase.auth
+
+    LaunchedEffect(key1 = Unit) {
+        viewModel.getAccountState()
+        viewModel.getEmail()
     }
 
-    val errorState = remember {
-        mutableStateOf("")
-    }
-
-    val emailState = remember {
-        mutableStateOf("aleocelr@gmail.com")
-    }
-
-    val passwordState = remember {
-        mutableStateOf("123456789")
+    //при разрушении экрана
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.saveLastEmail()
+            viewModel.passwordState.value = ""
+        }
     }
 
     Image(painter = painterResource(id = R.drawable.games_store_bg),
@@ -81,7 +84,7 @@ fun LoginScreen(
     ) {
         Image(
             painter = painterResource(id = R.drawable.logo),
-            contentDescription = "logo",
+            contentDescription = "Logo",
             modifier = Modifier.size(200.dp)
         )
 
@@ -91,7 +94,7 @@ fun LoginScreen(
         )
 
         Text(
-            text = "ИгроХаб",
+            text = stringResource(R.string.app_name_ru),
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
             fontFamily = FontFamily.Default,
@@ -103,128 +106,121 @@ fun LoginScreen(
                 .height(30.dp)
         )
 
-        RoundedCornerTextField(
-            text = emailState.value,
-            label = "Почта",
-        ) {
-            emailState.value = it
-        }
+        if (viewModel.currentUser.value == null) {
 
-        Spacer(
-            modifier = Modifier
-                .height(10.dp)
-        )
+            RoundedCornerTextField(
+                text = viewModel.emailState.value,
+                label = stringResource(R.string.email),
+            ) {
+                viewModel.emailState.value = it
+            }
 
-        RoundedCornerTextField(
-            text = passwordState.value,
-            label = "Пароль",
-            isPassword = true
-        ) {
-            passwordState.value = it
-        }
-
-        Spacer(
-            modifier = Modifier
-                .height(10.dp)
-        )
-
-        // сообщение об ошибке
-        if (errorState.value.isNotEmpty()) {
-            Text(
-                text = errorState.value,
-                color = Color.Red,
-                textAlign = TextAlign.Center
+            Spacer(
+                modifier = Modifier
+                    .height(10.dp)
             )
-        }
+            if (!viewModel.resetPasswordState.value) {
 
-        LoginButton(
-            text = "Войти"
-        ) {
-            signIn(
-                auth,
-                emailState.value,
-                passwordState.value,
-                onSignInSuccess = { navData ->
-                    onNavigateToMainScreen(navData)
-                },
-                onSignInFailure = { error ->
-                    errorState.value = error
+                RoundedCornerTextField(
+                    text = viewModel.passwordState.value,
+                    label = stringResource(R.string.password),
+                    isPassword = true
+                ) {
+                    viewModel.passwordState.value = it
                 }
-            )
-        }
 
-        LoginButton(
-            text = "Зарегистрироваться"
-        ) {
-            signUp(
-                auth,
-                emailState.value,
-                passwordState.value,
-                onSignUpSuccess = { navData ->
-                    onNavigateToMainScreen(navData)
-                },
-                onSignUpFailure = { error ->
-                    errorState.value = error
+                Spacer(
+                    modifier = Modifier
+                        .height(10.dp)
+                )
+
+            }
+
+            // сообщение об ошибке errorMessage
+            if (viewModel.errorState.value.isNotEmpty()) {
+                Text(
+                    text = viewModel.errorState.value,
+                    color = Color.Red,
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            //если не сброс пароля то показываем войти
+            if (!viewModel.resetPasswordState.value) {
+
+                LoginButton(
+                    text = stringResource(R.string.sign_in)
+                ) {
+                    viewModel.signIn(
+                        onSignInSuccess = { navData ->
+                            onNavigateToMainScreen(navData)
+                        }
+                    )
                 }
+
+            }
+
+            LoginButton(
+                text = if (viewModel.resetPasswordState.value){
+                    stringResource(R.string.reset_password)
+                } else {
+                    stringResource(R.string.sign_up)
+                }
+            ) {
+                viewModel.signUp(
+                    onSignUpSuccess = { navData ->
+                        onNavigateToMainScreen(navData)
+                    }
+                )
+            }
+
+            Spacer(modifier = Modifier
+                .height(10.dp)
             )
-        }
 
-    }
+            if (!viewModel.resetPasswordState.value) {
+                Text(
+                    modifier = Modifier.clickable {
+                        viewModel.errorState.value = "" //очищаем errorstate
+                        viewModel.resetPasswordState.value = true
+                    },
+                    text = stringResource(R.string.forgot_password),
+                    color = Color.Black
+                )
+            }
 
-}
+        } else {
 
-fun signUp(
-    auth: FirebaseAuth,
-    email: String,
-    password: String,
-    onSignUpSuccess: (MainScreenDataObject) -> Unit,
-    onSignUpFailure: (String) -> Unit
-) {
-    if (email.isBlank() || password.isBlank()) {
-        onSignUpFailure("Пустые поля ввода")
-        return
-    }
-
-    auth.createUserWithEmailAndPassword(email, password)
-        .addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                onSignUpSuccess(
+            LoginButton(
+                text = stringResource(R.string.enter)
+            ) {
+                onNavigateToMainScreen(
                     MainScreenDataObject(
-                        task.result.user?.uid!!,
-                        task.result.user?.email!!
+                        viewModel.currentUser.value!!.uid,
+                        viewModel.currentUser.value!!.email!!
                     )
                 )
             }
-        }
-        .addOnFailureListener {
-            onSignUpFailure(it.message ?: "Ошибка регистрации")
-        }
-}
 
-fun signIn(
-    auth: FirebaseAuth,
-    email: String,
-    password: String,
-    onSignInSuccess: (MainScreenDataObject) -> Unit,
-    onSignInFailure: (String) -> Unit
-) {
-    if (email.isBlank() || password.isBlank()) {
-        onSignInFailure("Пустые поля ввода")
-        return
+            LoginButton(
+                text = stringResource(R.string.sign_out)
+            ) {
+                viewModel.signOut()
+            }
+
+        }
+
+        MyDialog(
+            showDialog = viewModel.showResetPasswordDialog.value,
+            onDismiss = {
+                viewModel.showResetPasswordDialog.value = false
+            },
+            onConfirm = {
+                viewModel.showResetPasswordDialog.value = false
+            },
+            message = stringResource(R.string.reset_password_message)
+        )
+
     }
 
-    auth.signInWithEmailAndPassword(email, password)
-        .addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                onSignInSuccess(
-                    MainScreenDataObject(
-                        task.result.user?.uid!!,
-                        task.result.user?.email!!
-                    )
-                )
-            }
-        }
-        .addOnFailureListener {
-            onSignInFailure(it.message ?: "Ошибка входа")
-        }
 }

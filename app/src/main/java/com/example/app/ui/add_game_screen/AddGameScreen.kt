@@ -1,6 +1,7 @@
 package com.example.app.ui.add_game_screen
 
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -15,68 +16,60 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.app.R
 import com.example.app.data.Game
 import com.example.app.ui.add_game_screen.data.AddScreenObject
 import com.example.app.ui.login.LoginButton
 import com.example.app.ui.login.RoundedCornerTextField
+import com.example.app.ui.main_screen.MainScreenViewModel
 import com.example.app.ui.theme.BoxFilterColor
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.collect
 
 @Preview(showBackground = true)
 @Composable
 fun AddGameScreen(
     navData: AddScreenObject = AddScreenObject(),
-    onSaved: () -> Unit = {}
+    onSaved: () -> Unit = {},
+
+    viewModel: AddGameViewModel = hiltViewModel()
 ) {
 
-    val selectedCategory = remember {
-        mutableStateOf(navData.category)
-    }
+    val context = LocalContext.current
 
-    val title = remember {
-        mutableStateOf(navData.title)
+    //val selectedCategory = remember {
+    //    mutableIntStateOf(navData.categoryIndex)
+    //}
+
+    val showLoadIndicator = remember {
+        mutableStateOf(false)
     }
 
     val navImageUrl = remember {
         mutableStateOf(navData.imageUrl)
-    }
-
-    val description = remember {
-        mutableStateOf(navData.description)
-    }
-
-    val price = remember {
-        mutableStateOf(navData.price)
-    }
-
-    val selectedImageUri = remember {
-        mutableStateOf<Uri?>(null)
-    }
-
-    val firestore = remember {
-        Firebase.firestore
-    }
-
-    val storage = remember {
-        Firebase.storage
     }
 
     Image(painter = painterResource(id = R.drawable.games_store_bg),
@@ -89,6 +82,24 @@ fun AddGameScreen(
         modifier = Modifier.fillMaxSize()
             .background(BoxFilterColor)
     )
+
+    LaunchedEffect(Unit) {
+        viewModel.setDefaultsData(navData)
+        viewModel.uiState.collect{ state ->
+            when (state) {
+                is MainScreenViewModel.MainUiState.Loading -> {
+                    showLoadIndicator.value = true
+                }
+                is MainScreenViewModel.MainUiState.Success -> {
+                    onSaved()
+                }
+                is MainScreenViewModel.MainUiState.Error -> {
+                    showLoadIndicator.value = false
+                    Toast.makeText(context,"Ошибка: ${state.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 
     Column(
 
@@ -105,12 +116,12 @@ fun AddGameScreen(
             contract = ActivityResultContracts.GetContent()
         ) { uri ->
             navImageUrl.value =""
-            selectedImageUri.value = uri
+            viewModel.selectedImageUri.value = uri
         }
 
         Image(
             painter = rememberAsyncImagePainter(
-                model = navImageUrl.value.ifEmpty { selectedImageUri.value }
+                model = navImageUrl.value.ifEmpty { viewModel.selectedImageUri.value }
             ),
             contentDescription = "logo",
             modifier = Modifier.size(90.dp)
@@ -122,7 +133,7 @@ fun AddGameScreen(
         )
 
         Text(
-            text = "Добавить игру",
+            text = stringResource(R.string.add_product),
             fontSize = 25.sp,
             fontWeight = FontWeight.Bold,
             fontFamily = FontFamily.Default,
@@ -134,8 +145,8 @@ fun AddGameScreen(
                 .height(30.dp)
         )
 
-        RoundedCornerDropDownMenu(selectedCategory.value) { selectedItem ->
-            selectedCategory.value = selectedItem
+        RoundedCornerDropDownMenu(viewModel.selectedCategory.intValue) { selectedItemIndex ->
+            viewModel.selectedCategory.intValue = selectedItemIndex
         }
 
         Spacer(
@@ -146,10 +157,10 @@ fun AddGameScreen(
         //поле ввода заголовок
 
         RoundedCornerTextField(
-            text = title.value,
-            label = "Заголовок"
+            text = viewModel.title.value,
+            label = stringResource(R.string.title)
         ) {
-            title.value = it
+            viewModel.title.value = it
         }
 
         Spacer(
@@ -162,10 +173,10 @@ fun AddGameScreen(
         RoundedCornerTextField(
             maxLines = 5,
             singleLine = false,
-            text = description.value,
-            label = "Описание"
+            text = viewModel.description.value,
+            label = stringResource(R.string.description)
         ) {
-            description.value = it
+            viewModel.description.value = it
         }
 
         Spacer(
@@ -176,10 +187,10 @@ fun AddGameScreen(
         //поле ввода цена
 
         RoundedCornerTextField(
-            text = price.value,
-            label = "Цена"
+            text = viewModel.price.value,
+            label = stringResource(R.string.price)
         ) {
-            price.value = it
+            viewModel.price.value = it
         }
 
         Spacer(
@@ -188,110 +199,18 @@ fun AddGameScreen(
         )
 
         LoginButton(
-            text = "Выбрать картинку"
+            text = stringResource(R.string.choose_image)
         ) {
             imageLauncher.launch("image/*")
         }
 
         LoginButton(
-            text = "Сохранить"
+            text = stringResource(R.string.save),
+            showLoadIndicator.value
         ) {
-
-            val game = Game(
-                key = navData.key,
-                title = title.value,
-                description = description.value,
-                price = price.value,
-                category = selectedCategory.value
-            )
-
-            if (selectedImageUri.value != null) {
-
-                saveGameImage(
-                    navData.imageUrl,
-                    selectedImageUri.value!!,
-                    storage,
-                    firestore,
-                    game,
-                    onSaved = {
-                        onSaved()
-                    },
-                    onError = {
-
-                    }
-                )
-            } else {
-
-                saveGameToFireStore(
-                    firestore,
-                    game.copy(imageUrl = navData.imageUrl),
-                    onSaved = {
-                        onSaved()
-                    },
-                    onError = {
-
-                    }
-                )
-
-            }
-
+            viewModel.uploadGame(navData)
         }
 
     }
 }
 
-private fun saveGameImage(
-    oldImageUrl: String,
-    uri: Uri,
-    storage: FirebaseStorage,
-    firestore: FirebaseFirestore,
-    game: Game,
-    onSaved: () -> Unit,
-    onError: () -> Unit
-) {
-    val timeStamp = System.currentTimeMillis()
-    val storageRef = if(oldImageUrl.isEmpty()) {
-        storage.reference
-            .child("game_images")
-            .child("image_$timeStamp.jpg")
-    } else {
-        storage.getReferenceFromUrl(oldImageUrl)
-    }
-    val uploadTask = storageRef.putFile(uri)
-    uploadTask.addOnSuccessListener {
-        storageRef.downloadUrl.addOnSuccessListener { url ->
-            saveGameToFireStore(
-                firestore,
-                game.copy(imageUrl = url.toString()),
-                onSaved = {
-                    onSaved()
-                },
-                onError = {
-                    onError()
-                }
-            )
-        }
-    }
-}
-
-private fun saveGameToFireStore(
-    firestore: FirebaseFirestore,
-    game: Game,
-    onSaved: () -> Unit,
-    onError: () -> Unit
-) {
-    val db = firestore.collection("games")
-    val key = game.key.ifEmpty { db.document().id }
-    db.document(key)
-        .set(
-            game.copy(
-                key = key,
-            )
-        )
-        .addOnSuccessListener {
-            onSaved()
-        }
-        .addOnFailureListener {
-            onError()
-        }
-}

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="category_array">
+        <item>Экшен</item> <!--  0 -->
+        <item>Приключения</item> <!--  1 -->
+        <item>Ролевая игра (RPG)</item> <!--  2 -->
+        <item>Симулятор</item> <!--  3 -->
+    </string-array>
+</resources>

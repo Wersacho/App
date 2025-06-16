@@ -13,7 +13,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -21,7 +20,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.app.R
-import com.example.app.ui.theme.ButtonColor
+import com.example.app.ui.theme.LightRed
 
 @Composable
 fun RoundedCornerTextField(
@@ -51,7 +50,7 @@ fun RoundedCornerTextField(
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .border(1.dp, ButtonColor, RoundedCornerShape(25.dp)),
+            .border(1.dp, LightRed, RoundedCornerShape(25.dp)),
         label = {
             Text(text = label, color = Color.Gray)
         },

@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,36 +16,35 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.unit.dp
-import com.example.app.ui.theme.ButtonColor
+import com.example.app.R
+import com.example.app.ui.main_screen.utils.Categories
+import com.example.app.ui.theme.LightRed
 
 @Composable
 fun RoundedCornerDropDownMenu(
-    defCategory: String,
-    onOptionSelected: (String) -> Unit
+    defCategory: Int,
+    onOptionSelected: (Int) -> Unit
 ) {
 
     val expanded = remember {
         mutableStateOf(false)
     }
-
+    val categoriesList = stringArrayResource(id = R.array.category_array)
     val selectedOption = remember {
-        mutableStateOf(defCategory)
+        mutableStateOf(categoriesList[Categories.ACTION])
     }
 
-    val categoriesList = listOf(
-        "Экшен",
-        "Приключения",
-        "Ролевая игра (RPG)",
-        "Симулятор"
-    )
+    //обновляем когда приходит реальное значение
+    selectedOption.value = categoriesList[defCategory]
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .border(
                 width = 1.dp,
-                color = ButtonColor,
+                color = LightRed,
                 shape = RoundedCornerShape(25.dp)
             )
             .clip(RoundedCornerShape(25.dp))
@@ -63,16 +61,16 @@ fun RoundedCornerDropDownMenu(
                 expanded.value = false
             }
         ) {
-            categoriesList.forEach{ option ->
+            categoriesList.forEachIndexed { index, title ->
                 DropdownMenuItem(
                     text = {
-                        Text(text = option)
+                        Text(text = title)
                     },
                     onClick = {
-                        selectedOption.value = option
+                        selectedOption.value = title
                         expanded.value = false
                         // передаем в addbookscreen
-                        onOptionSelected(option)
+                        onOptionSelected(index)
                     }
                 )
             }

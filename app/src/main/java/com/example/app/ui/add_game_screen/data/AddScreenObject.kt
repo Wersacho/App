@@ -1,5 +1,6 @@
 package com.example.app.ui.add_game_screen.data
 
+import com.example.app.ui.main_screen.utils.Categories
 import kotlinx.serialization.Serializable
 
 
@@ -9,6 +10,6 @@ data class AddScreenObject(
     val title: String = "",
     val description: String = "",
     val price: String = "",
-    val category: String = "",
+    val categoryIndex: Int = Categories.ACTION,
     val imageUrl: String = ""
 )

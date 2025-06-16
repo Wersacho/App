@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="category_array">
+        <item>Action</item> <!--  0 -->
+        <item>Adventure</item> <!--  1 -->
+        <item>Role-Playing (RPG)</item> <!--  2 -->
+        <item>Simulation</item> <!--  3 -->
+    </string-array>
+</resources>
