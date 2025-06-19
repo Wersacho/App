@@ -18,7 +18,7 @@
     <string name="favs">Favorites</string>
     <string name="settings">Settings</string>
     <!--    DrawerBody-->
-    <string name="add_product">Add Product</string>
+    <string name="admin_panel">Admin panel</string>
     <string name="categories">Categories</string>
     <string name="all">All</string>
     <!--FavScreen-->
@@ -32,5 +32,7 @@
     <string name="price">Price</string>
     <string name="choose_image">Choose Image</string>
     <string name="save">Save</string>
-
+    <!--MyDialog-->
+    <string name="cancel">Cancel</string>
+    <string name="confirm">OK</string>
 </resources>

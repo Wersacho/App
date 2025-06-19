@@ -1,6 +1,8 @@
 package com.example.app.ui.main_screen
 
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -10,7 +12,9 @@ import androidx.paging.map
 import com.example.app.data.Game
 import com.example.app.ui.main_screen.bottom_menu.BottomMenuItem
 import com.example.app.ui.main_screen.utils.Categories
+import com.example.app.utils.firebase.FilterData
 import com.example.app.utils.firebase.FireStoreManagerPaging
+import com.example.app.utils.firebase.FirebaseConst
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -19,6 +23,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.min
 
 @HiltViewModel
 class MainScreenViewModel @Inject constructor(
@@ -26,6 +31,10 @@ class MainScreenViewModel @Inject constructor(
 
     private val pager: Flow<PagingData<Game>>
 ): ViewModel() {
+
+    val minPriceValue = mutableFloatStateOf(0f)
+    val maxPriceValue = mutableFloatStateOf(0f)
+    val isFilterByTitle = mutableStateOf(true)
 
     val selectedBottomItemState = mutableIntStateOf(BottomMenuItem.Home.titleId)
     val categoryState = mutableIntStateOf(Categories.ALL)
@@ -71,6 +80,20 @@ class MainScreenViewModel @Inject constructor(
         _uiState.emit(state)
     }
 
+    fun setFilter(){
+        val filterData = FilterData(
+            minPrice = minPriceValue.floatValue.toInt(),
+            maxPrice = maxPriceValue.floatValue.toInt(),
+            filterType = if (isFilterByTitle.value) {
+                FirebaseConst.TITLE
+            } else {
+                FirebaseConst.PRICE
+            }
+        )
+        firestoreManager.filterData = filterData
+    }
+
+
     //удаляем игру
     fun deleteGame(uiList: List<Game>){
         if (gameToDelete == null) return
@@ -87,6 +110,10 @@ class MainScreenViewModel @Inject constructor(
                 sendUiState(MainUiState.Error(message))
             }
         )
+    }
+
+    fun searchGame(searchText: String){
+        firestoreManager.searchText = searchText
     }
 
     // отвечает за все

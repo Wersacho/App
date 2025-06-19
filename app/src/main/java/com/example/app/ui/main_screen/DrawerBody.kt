@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -24,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -76,6 +78,7 @@ fun DrawerBody(
         Column(
             modifier = Modifier
                 .fillMaxSize(),
+
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(
@@ -87,7 +90,7 @@ fun DrawerBody(
                 text = stringResource(R.string.categories),
                 //text = "Categories",
                 fontSize = 20.sp,
-                color = Color.Black,
+                color = Color.White,
                 fontWeight = FontWeight.Bold
             )
 
@@ -144,7 +147,7 @@ fun DrawerBody(
                         )
                     ) {
                         Text(
-                            text = stringResource(R.string.add_product),
+                            text = stringResource(R.string.admin_panel),
                             color = Color.Black
                         )
                     }

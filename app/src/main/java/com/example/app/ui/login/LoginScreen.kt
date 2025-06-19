@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -22,6 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -36,6 +38,7 @@ import com.example.app.R
 import com.example.app.custom.MyDialog
 import com.example.app.ui.login.data.MainScreenDataObject
 import com.example.app.ui.theme.BoxFilterColor
+import com.example.app.ui.theme.MidnightBlack
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -47,7 +50,6 @@ fun LoginScreen(
 
     onNavigateToMainScreen: (MainScreenDataObject) -> Unit
 ) {
-
 
     LaunchedEffect(key1 = Unit) {
         viewModel.getAccountState()
@@ -62,19 +64,7 @@ fun LoginScreen(
         }
     }
 
-    Image(painter = painterResource(id = R.drawable.games_store_bg),
-        contentDescription = "Background",
-        modifier = Modifier.fillMaxSize(),
-        contentScale = ContentScale.Crop
-    )
-
-    Box(
-        modifier = Modifier.fillMaxSize()
-            .background(BoxFilterColor)
-    )
-
     Column(
-
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
@@ -85,12 +75,14 @@ fun LoginScreen(
         Image(
             painter = painterResource(id = R.drawable.logo),
             contentDescription = "Logo",
-            modifier = Modifier.size(200.dp)
+            modifier = Modifier
+                .size(180.dp)
+                .clip(RoundedCornerShape(24.dp))
         )
 
         Spacer(
             modifier = Modifier
-                .height(30.dp)
+                .height(16.dp)
         )
 
         Text(
@@ -98,12 +90,12 @@ fun LoginScreen(
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
             fontFamily = FontFamily.Default,
-            color = Color.White
+            color = MidnightBlack
         )
 
         Spacer(
             modifier = Modifier
-                .height(30.dp)
+                .height(32.dp)
         )
 
         if (viewModel.currentUser.value == null) {

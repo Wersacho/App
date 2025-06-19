@@ -3,7 +3,6 @@ package com.example.app.ui.add_game_screen
 import android.net.Uri
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.app.data.Game
@@ -52,11 +51,11 @@ class AddGameViewModel @Inject constructor(
             title = title.value,
             description = description.value,
             key = navData.key,
-            price = price.value,
+            price = price.value.toInt(),
             category = selectedCategory.intValue
         )
 
-        fireStoreManager.saveGameImage(
+        fireStoreManager.uploadImageToStorage(
             oldImageUrl = navData.imageUrl,
             uri = selectedImageUri.value,
             game = game,

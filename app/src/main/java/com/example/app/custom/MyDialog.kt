@@ -5,16 +5,20 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import com.example.app.R
+
 
 @Composable
 fun MyDialog(
     showDialog: Boolean,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
-    title: String = "Сбросить пароль",
+    title: String = stringResource(R.string.reset_password),
     message: String = "",
-    confirmButtonText: String = "OK",
+    confirmButtonText: String = stringResource(R.string.confirm),
 ) {
     if (showDialog){
         AlertDialog(
@@ -42,7 +46,7 @@ fun MyDialog(
 
                 ) {
                     Text(
-                        text = "Отменить"
+                        text = stringResource(R.string.cancel)
                     )
                 }
             },

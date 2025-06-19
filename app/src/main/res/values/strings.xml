@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">App</string>
+    <string name="app_name" translatable="false">ИгроХаб</string>
     <string name="reset_password_message">Ссылка на сброс пароля была отправлена на вашу почту.
         Следуйте инструкциям, чтобы сбросить ваш пароль.
     </string>
@@ -19,8 +19,8 @@
     <string name="favs">Избранное</string>
     <string name="settings">Настройки</string>
 <!--    DrawerBody-->
-    <string name="add_product">Добавить товар</string>
-    <string name="categories">Жанры</string>
+    <string name="admin_panel">Панель администратора</string>
+    <string name="categories">Категории</string>
     <string name="all">Все</string>
 <!--FavScreen-->
     <string name="favs_empty">"Избранное пустое — добавьте игры, \n которые вам нравятся!"</string>
@@ -33,4 +33,7 @@
     <string name="price">Цена</string>
     <string name="choose_image">Выбрать картинку</string>
     <string name="save">Сохранить</string>
+    <!--MyDialog-->
+    <string name="cancel">Отменить</string>
+    <string name="confirm">ОК</string>
 </resources>

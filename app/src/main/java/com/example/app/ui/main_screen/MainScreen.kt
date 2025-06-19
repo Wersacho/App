@@ -12,15 +12,22 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,6 +40,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.app.R
+import com.example.app.custom.FilterDialog
 import com.example.app.custom.MyDialog
 import com.example.app.data.Favorite
 import com.example.app.data.Game
@@ -51,6 +59,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     viewModel: MainScreenViewModel = hiltViewModel(),
@@ -58,7 +67,8 @@ fun MainScreen(
     navData: MainScreenDataObject,
     onGameEditClick: (Game) -> Unit,
     onGameClick: (Game) -> Unit,
-    onAdminClick: () -> Unit
+    onAdminClick: () -> Unit,
+    onSettingsClick: () -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -71,7 +81,14 @@ fun MainScreen(
 
     val games = viewModel.games.collectAsLazyPagingItems()
 
+    val state = rememberPullToRefreshState()
+
     val isAdminState = remember {
+        mutableStateOf(false)
+    }
+
+    //состояние диалога фильтров
+    var showFilterDialog by remember {
         mutableStateOf(false)
     }
 
@@ -115,8 +132,6 @@ fun MainScreen(
 
                         onAdminClick()
 
-                        //опустошаем список для обновления
-                        //viewModel.gamesListState.value = emptyList()
                     },
 
                     onCategoryClick = { categoryIndex ->
@@ -147,7 +162,14 @@ fun MainScreen(
             //топ бар
             topBar = {
                 MainTopBar(
-                    viewModel.categoryState.intValue
+                    viewModel.categoryState.intValue,
+                    onSearch = { searchText ->
+                        viewModel.searchGame(searchText)
+                        games.refresh()
+                    },
+                    onFilter = {
+                        showFilterDialog = true
+                    }
                 )
             },
 
@@ -172,6 +194,10 @@ fun MainScreen(
                         viewModel.getGamesFromCategory(Categories.ALL)
                         //обновляем категории принудительно
                         games.refresh()
+                    },
+
+                    onSettingsClick = {
+                        onSettingsClick()
                     }
                 )
             }
@@ -225,46 +251,80 @@ fun MainScreen(
 
             }
 
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
+            PullToRefreshBox(
+                isRefreshing = games.loadState.refresh is LoadState.Loading,
+                onRefresh = {
+                    games.refresh()
+                },
+                state = state,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues)
+                    .padding(paddingValues),
+                indicator = {
+                    Indicator(
+                        modifier = Modifier.align(Alignment.TopCenter),
+                        isRefreshing = games.loadState.refresh is LoadState.Loading,
+                        containerColor = Color.White,
+                        color = LightRed,
+                        state = state
+                    )
+                }
             ) {
-                items(count = games.itemCount) { index ->
-                    //достаем товары по индексу
-                    val game = games[index]
-                    if (game != null) {
-                        GameListItemUi(
-                            isAdminState.value,
-                            game,
 
-                            onGameClick = { gm ->
-                                onGameClick(gm)
-                            },
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    items(count = games.itemCount) { index ->
+                        //достаем товары по индексу
+                        val game = games[index]
+                        if (game != null) {
+                            GameListItemUi(
+                                isAdminState.value,
+                                game,
 
-                            onEditClick = {
-                                onGameEditClick(it)
-                            },
+                                onGameClick = { gm ->
+                                    onGameClick(gm)
+                                },
 
-                            onDeleteClick = { gameToDelete ->
-                                showDeleteDialog.value = true
-                                viewModel.gameToDelete = gameToDelete
-                            },
+                                onEditClick = {
+                                    onGameEditClick(it)
+                                },
 
-                            onFavClick = {
+                                onDeleteClick = { gameToDelete ->
+                                    showDeleteDialog.value = true
+                                    viewModel.gameToDelete = gameToDelete
+                                },
 
-                                viewModel.onFavClick(
-                                    game,
-                                    viewModel.selectedBottomItemState.intValue,
-                                    games.itemSnapshotList.items
-                                )
+                                onFavClick = {
 
-                            }
-                        )
+                                    viewModel.onFavClick(
+                                        game,
+                                        viewModel.selectedBottomItemState.intValue,
+                                        games.itemSnapshotList.items
+                                    )
+
+                                }
+                            )
+                        }
                     }
                 }
+
             }
+
+
+            //фильтры
+            FilterDialog(
+                showDialog = showFilterDialog,
+                onConfirm = {
+                    showFilterDialog = false
+                    games.refresh()
+                },
+                onDismiss = {
+                    showFilterDialog = false
+                }
+            )
         }
     }
 

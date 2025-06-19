@@ -57,6 +57,7 @@ android {
 }
 
 dependencies {
+
     implementation(libs.androidx.paging)
 
     implementation(libs.android.hilt)

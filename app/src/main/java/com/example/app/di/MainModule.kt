@@ -27,9 +27,10 @@ object MainModule {
     fun provideFirebasePagingManager(
         db: FirebaseFirestore,
         auth: FirebaseAuth,
-        storage: FirebaseStorage
+        storage: FirebaseStorage,
+        app: Application
     ): FireStoreManagerPaging {
-        return FireStoreManagerPaging(db, auth, storage)
+        return FireStoreManagerPaging(db, auth, storage, app.contentResolver)
     }
 
     @Provides

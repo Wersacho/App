@@ -17,6 +17,7 @@ import com.example.app.ui.theme.LightRed
 
 @Composable
 fun LoginButton(
+    modifier: Modifier = Modifier,
     text: String,
     showLoadIndicator: Boolean = false,
     onClick: () -> Unit
@@ -24,7 +25,7 @@ fun LoginButton(
     Button(onClick = {
         onClick()
     },
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth(),
         colors = ButtonDefaults.buttonColors(
             containerColor = LightRed

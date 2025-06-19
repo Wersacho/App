@@ -39,8 +39,7 @@ fun DrawerListItem(
         Text(
             text = title,
             color = Color.White,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp,
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentWidth()

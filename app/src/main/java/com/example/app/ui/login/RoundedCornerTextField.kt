@@ -48,12 +48,14 @@ fun RoundedCornerTextField(
             unfocusedIndicatorColor = Color.Transparent,
             focusedIndicatorColor = Color.Transparent
         ),
+
         modifier = Modifier
             .fillMaxWidth()
             .border(1.dp, LightRed, RoundedCornerShape(25.dp)),
         label = {
             Text(text = label, color = Color.Gray)
         },
+
         singleLine = singleLine,
         maxLines = maxLines,
         visualTransformation = if (isPasswordVisible || !isPassword) {
@@ -61,6 +63,7 @@ fun RoundedCornerTextField(
         } else {
             PasswordVisualTransformation()
         },
+
         trailingIcon = {
             if (isPassword) {
 

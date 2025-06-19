@@ -133,7 +133,7 @@ fun AddGameScreen(
         )
 
         Text(
-            text = stringResource(R.string.add_product),
+            text = stringResource(R.string.admin_panel),
             fontSize = 25.sp,
             fontWeight = FontWeight.Bold,
             fontFamily = FontFamily.Default,
@@ -206,7 +206,7 @@ fun AddGameScreen(
 
         LoginButton(
             text = stringResource(R.string.save),
-            showLoadIndicator.value
+            showLoadIndicator = showLoadIndicator.value
         ) {
             viewModel.uploadGame(navData)
         }

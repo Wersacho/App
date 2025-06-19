@@ -1,19 +1,26 @@
 package com.example.app.ui.main_screen
 
+import android.annotation.SuppressLint
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -32,6 +39,7 @@ import coil.compose.AsyncImage
 import com.example.app.data.Game
 import com.example.app.ui.main_screen.utils.Categories
 
+@SuppressLint("DefaultLocale")
 @Preview (showBackground = true)
 @Composable
 fun GameListItemUi(
@@ -39,7 +47,7 @@ fun GameListItemUi(
     game: Game = Game(
         title = "Title",
         description = "Description",
-        price = "100",
+        price = 100,
         category = Categories.ACTION
     ),
     onEditClick: (Game) -> Unit = {},
@@ -55,15 +63,57 @@ fun GameListItemUi(
                 onGameClick(game)
             }
     ) {
-        AsyncImage(
-            model = game.imageUrl,
-            contentDescription = "",
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(250.dp)
-                .clip(RoundedCornerShape(15.dp)),
-            contentScale = ContentScale.Crop
-        )
+                .height(250.dp),
+            contentAlignment = Alignment.BottomEnd
+        ) {
+            AsyncImage(
+                model = game.imageUrl,
+                contentDescription = "",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .clip(RoundedCornerShape(15.dp)),
+                contentScale = ContentScale.Crop
+            )
+            Box(
+                modifier = Modifier
+                    .padding(6.dp)
+            ) {
+                Row(
+                    Modifier
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color.White)
+                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = if (game.ratingsList.isEmpty()) {
+                            "--"
+                        } else {
+                            String.format("%.1f", game.ratingsList.average())
+                        },
+                        color = Color.Black,
+                        fontWeight = FontWeight.Bold,
+                        fontSize =  16.sp
+                    )
+
+                    Spacer(Modifier.width(6.dp))
+
+                    Icon(
+                        modifier = Modifier.size(16.dp),
+                        imageVector = Icons.Default.Star,
+                        contentDescription = "Rating",
+                        tint = Color(0xFFFFC107)
+                    )
+                }
+            }
+
+        }
+
+
 
         Spacer(
             modifier = Modifier
@@ -107,7 +157,7 @@ fun GameListItemUi(
             Text(
                 modifier = Modifier.fillMaxWidth()
                     .weight(1f),
-                text = game.price,
+                text = "${game.price.toString()} ₽",
                 color = Color.Blue,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp

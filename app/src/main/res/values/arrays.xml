@@ -6,4 +6,31 @@
         <item>Ролевая игра (RPG)</item> <!--  2 -->
         <item>Симулятор</item> <!--  3 -->
     </string-array>
+
+
+    <string-array name="order_by">
+        <item>Названию</item>
+        <item>Цене</item>
+    </string-array>
+
+    <string-array name="personal_data_array">
+        <item>Имя или никнейм</item>
+        <item>Номер телефона</item>
+    </string-array>
+
+    <string-array name="adress_array">
+        <item>Город</item>
+        <item>Улица</item>
+        <item>Квартира</item>
+        <item>Почтовый индекс</item>
+    </string-array>
+
+    <string-array name="password_array">
+        <item>Почта</item>
+    </string-array>
+
+    <string-array name="delete_account_array">
+        <item>Почта</item>
+        <item>Пароль</item>
+    </string-array>
 </resources>

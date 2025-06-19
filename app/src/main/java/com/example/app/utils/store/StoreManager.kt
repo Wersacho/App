@@ -9,10 +9,12 @@ class StoreManager(
 ) {
     private val pref = context.getSharedPreferences(MAIN_PREF, Context.MODE_PRIVATE)
 
+    //сохраняем ключ значение
     fun saveString(key: String, value: String) {
         pref.edit().putString(key, value).apply()
     }
 
+    //достаем когда возвращаемся на экран
     fun getString(key: String, defValue: String) : String {
         return pref.getString(key, defValue) ?: defValue
     }

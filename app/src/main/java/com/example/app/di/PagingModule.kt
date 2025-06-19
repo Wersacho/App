@@ -26,11 +26,11 @@ object PagingModule {
         return Pager(
             config = PagingConfig(
                 //сколько в одной странице товаров
-                pageSize = 10,
+                pageSize = 6,
                 //сколько товаров остается чтобы начать подргрузку
                 prefetchDistance = 3,
                 //начальный размер страницы при первой загрузке
-                initialLoadSize = 15,
+                initialLoadSize = 9,
             ),
             pagingSourceFactory = {
                 GameFactoryPaging(fireStoreManagerPaging)

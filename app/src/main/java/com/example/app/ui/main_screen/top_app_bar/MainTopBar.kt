@@ -23,6 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -35,7 +36,9 @@ import com.example.app.ui.theme.LightRed
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainTopBar(
-    titleIndex: Int
+    titleIndex: Int,
+    onSearch: (String) -> Unit,
+    onFilter: () -> Unit
 ) {
 
     var targetState by remember {
@@ -68,17 +71,17 @@ fun MainTopBar(
                                 text = "Искать игру"
                             )
                         },
+                        //отправляются запросы при каждом вводе с клавы
                         onQueryChange = { text ->
                             queryText = text
                         },
-                        onSearch = {
-
+                        //отправляется запрос при нажатии поиск с клавы
+                        onSearch = { text ->
+                            onSearch(text)
                         },
                         //контролируем состояние
                         expanded = expandedState,
-                        onExpandedChange = { expanded ->
-                            expandedState = expanded
-                        },
+                        onExpandedChange = {},
                         //закрыть кнопка
                         trailingIcon = {
                             IconButton(
@@ -86,6 +89,7 @@ fun MainTopBar(
                                     expandedState = false
                                     targetState = false
                                     queryText = ""
+                                    onSearch("")
                                 }
                             ) {
                                 Icon(
@@ -143,6 +147,17 @@ fun MainTopBar(
                         Icon(
                             Icons.Default.Search,
                             contentDescription = "Поиск"
+                        )
+                    }
+                    //filters
+                    IconButton(
+                        onClick = {
+                            onFilter()
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_tune),
+                            contentDescription = "Фильтр"
                         )
                     }
                 },
