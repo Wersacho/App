@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.app.ui.login.LoginButton
+import com.example.app.ui.login.ui.LoginButton
 
 @Composable
 fun AdminPanelScreen(

@@ -1,4 +1,4 @@
-package com.example.app.ui.main_screen
+package com.example.app.ui.main_screen.drawer
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.app.R
 import com.example.app.ui.theme.DarkRed
-import com.example.app.ui.theme.PalePeriwinkle
 import com.example.app.ui.theme.PaleWhite
 
 @Composable

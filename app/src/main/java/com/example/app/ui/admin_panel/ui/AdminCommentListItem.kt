@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.app.custom.StarsIndicator
 import com.example.app.ui.details_screen.data.RatingData
-import com.example.app.ui.login.LoginButton
+import com.example.app.ui.login.ui.LoginButton
 import com.example.app.ui.theme.LightGray1
 
 @Composable

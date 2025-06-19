@@ -1,6 +1,5 @@
 package com.example.app.ui.add_game_screen
 
-import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -17,7 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -29,27 +27,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.app.R
-import com.example.app.data.Game
 import com.example.app.ui.add_game_screen.data.AddScreenObject
-import com.example.app.ui.login.LoginButton
-import com.example.app.ui.login.RoundedCornerTextField
+import com.example.app.ui.login.ui.LoginButton
+import com.example.app.ui.login.ui.RoundedCornerTextField
 import com.example.app.ui.main_screen.MainScreenViewModel
 import com.example.app.ui.theme.BoxFilterColor
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.ktx.storage
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.collect
 
-@Preview(showBackground = true)
+
 @Composable
 fun AddGameScreen(
     navData: AddScreenObject = AddScreenObject(),
@@ -124,7 +113,7 @@ fun AddGameScreen(
                 model = navImageUrl.value.ifEmpty { viewModel.selectedImageUri.value }
             ),
             contentDescription = "logo",
-            modifier = Modifier.size(90.dp)
+            modifier = Modifier.size(200.dp)
         )
 
         Spacer(

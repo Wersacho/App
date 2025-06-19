@@ -17,11 +17,10 @@ import com.example.app.ui.comments_screen.CommentsNavData
 import com.example.app.ui.comments_screen.CommentsScreen
 import com.example.app.ui.details_screen.data.DetailsNavObject
 import com.example.app.ui.details_screen.ui.DetailsScreen
-import com.example.app.ui.login.LoginScreen
+import com.example.app.ui.login.ui.LoginScreen
 import com.example.app.ui.login.data.LoginScreenObject
 import com.example.app.ui.login.data.MainScreenDataObject
 import com.example.app.ui.main_screen.MainScreen
-import com.example.app.ui.main_screen.bottom_menu.BottomMenuItem
 import com.example.app.ui.settings_screen.data.SettingsNavData
 import com.example.app.ui.settings_screen.ui.SettingsScreen
 import dagger.hilt.android.AndroidEntryPoint

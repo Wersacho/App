@@ -9,11 +9,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -42,20 +40,15 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.app.R
 import com.example.app.custom.FilterDialog
 import com.example.app.custom.MyDialog
-import com.example.app.data.Favorite
 import com.example.app.data.Game
 import com.example.app.ui.login.data.MainScreenDataObject
 import com.example.app.ui.main_screen.bottom_menu.BottomMenu
 import com.example.app.ui.main_screen.bottom_menu.BottomMenuItem
+import com.example.app.ui.main_screen.drawer.DrawerBody
+import com.example.app.ui.main_screen.drawer.DrawerHeader
 import com.example.app.ui.main_screen.top_app_bar.MainTopBar
 import com.example.app.ui.main_screen.utils.Categories
-import com.example.app.ui.theme.DarkRed
 import com.example.app.ui.theme.LightRed
-import com.google.firebase.firestore.FieldPath
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 

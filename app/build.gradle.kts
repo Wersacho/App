@@ -74,7 +74,7 @@ dependencies {
     implementation(libs.firebase.storage)
     implementation(libs.firebase.auth)
 
-    implementation(libs.coil.compose) // coil
+    implementation(libs.coil.compose)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

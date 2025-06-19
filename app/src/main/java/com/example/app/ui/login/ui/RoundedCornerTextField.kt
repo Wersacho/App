@@ -1,4 +1,4 @@
-package com.example.app.ui.login
+package com.example.app.ui.login.ui
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxWidth
